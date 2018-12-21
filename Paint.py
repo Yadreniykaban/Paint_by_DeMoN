@@ -21,16 +21,16 @@ class Window(QMainWindow):
 
         self.lastPoint = QPoint()
 
-        mainMenu = QMenuBar()
+        mainMenu = self.menuBar()
         fileMenu = mainMenu.addMenu("File")
         brushMenu = mainMenu.addMenu("Brush size")
         brushColor = mainMenu.addMenu("Color")
 
-        saveAction = QAction(QIcon("icons/paint.png"), "Save", self)
+        saveAction = QAction(QIcon("icons/box_green.png"), "Save", self)
         saveAction.setShortcut("Ctrl+S")
         fileMenu.addAction(saveAction)
 
-        clearAction = QAction(QIcon("icons/paint.png"), "Clear", self)
+        clearAction = QAction(QIcon("icons/box_paint.png"), "Clear", self)
         clearAction.setShortcut("Ctrl+Z")
         fileMenu.addAction(clearAction)
 
@@ -43,7 +43,7 @@ class Window(QMainWindow):
         fileMenu.addAction(fivepxAction)
 
         sevenpxAction = QAction(QIcon("icons/paint.png"), "7px", self)
-        sevenpxAction.setShortcut("Ctrl+G")
+        sevenpxAction.setShortcut("Ctrl+O")
         fileMenu.addAction(sevenpxAction)
 
         ninepxAction = QAction(QIcon("icons/paint.png"), "9px", self)
@@ -54,9 +54,17 @@ class Window(QMainWindow):
         blackAction.setShortcut("Ctrl+B")
         brushColor.addAction(blackAction)
 
-        redAction = QAction(QIcon("icons/paint.png"), "Red", self)
+        redAction = QAction(QIcon("icons/box_red.png"), "Red", self)
         redAction.setShortcut("Ctrl+R")
         brushColor.addAction(redAction)
+
+        greenAction = QAction(QIcon("icons/box_green.png"), "Green", self)
+        greenAction.setShortcut("Ctrl+G")
+        brushColor.addAction(greenAction)
+
+        yellowAction = QAction(QIcon("icons/box_yellow.png"), "Yellow", self)
+        yellowAction.setShortcut("Ctrl+R")
+        brushColor.addAction(yellowAction)
 
 
 if __name__ == '__main__':
