@@ -1,16 +1,18 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QFileDialog
-from PyQt5.QtGui import QImage, QIcon, QPainter, QPen
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QFileDialog, QColorDialog
+from PyQt5.QtGui import QImage, QIcon, QPainter, QPen, QColor, QBrush
 from PyQt5.QtCore import Qt, QPoint
 
 
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.initUI()
 
+    def initUI(self):
         self.setWindowTitle("Paint by DeMoN:D")
         self.setWindowIcon(QIcon("icons/paint.png"))
-        self.setGeometry(400, 400, 800, 600)
+        self.setGeometry(400, 400, 1024, 768)
 
         self.image = QImage(self.size(), QImage.Format_RGB32)
         self.image.fill(Qt.white)
@@ -87,14 +89,15 @@ class Window(QMainWindow):
         brushColor.addAction(blueAction)
         blueAction.triggered.connect(self.blue)
 
+        rgbAction = QAction(QIcon("icons/paint.png"), "Свой цвет(RGB)", self)
+        rgbAction.setShortcut("Ctrl+J")
+        brushColor.addAction(rgbAction)
+        rgbAction.triggered.connect(self.rgb)
+
         washAction = QAction(QIcon("icons/eraser.png"), "Ластик", self)
         washAction.setShortcut("Ctrl+P")
         brushColor.addAction(washAction)
         washAction.triggered.connect(self.wash)
-
-        rectangleAction = QAction(QIcon("icons/paint.png"), "Прямоугольник", self)
-        geometryMenu.addAction(rectangleAction)
-        rectangleAction.triggered.connect(self.rectangle)
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -132,7 +135,7 @@ class Window(QMainWindow):
         self.image.load(filePath)
 
     def clear(self):
-        self.image.fill(Qt.white)
+        self.image.fill(QColor(255, 255, 255))
         self.update()
 
     def threePx(self):
@@ -148,22 +151,28 @@ class Window(QMainWindow):
         self.brushSize = 9
 
     def green(self):
-        self.brushColor = Qt.green
+        self.brushColor = QColor(0, 255, 0)
 
     def yellow(self):
-        self.brushColor = Qt.yellow
+        self.brushColor = QColor(255, 255, 0)
 
     def blue(self):
-        self.brushColor = Qt.blue
+        self.brushColor = QColor(0, 0, 255)
 
     def black(self):
-        self.brushColor = Qt.black
+        self.brushColor = QColor(0, 0, 0)
 
     def red(self):
-        self.brushColor = Qt.red
+        self.brushColor = QColor(255, 0, 0)
 
     def wash(self):
-        self.brushColor = Qt.white
+        self.brushColor = QColor(255, 255, 255)
+
+    def rgb(self):
+        color = QColorDialog.getColor()
+        if color.isValid():
+            color.setNamedColor(color.name())
+            self.brushColor = color
 
 
 if __name__ == '__main__':
