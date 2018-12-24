@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QFileDialog, QColorDialog
 from PyQt5.QtGui import QImage, QIcon, QPainter, QPen, QColor, QBrush
-from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtCore import Qt, QPoint, QRect
 
 
 class Window(QMainWindow):
@@ -18,6 +18,7 @@ class Window(QMainWindow):
         self.image.fill(Qt.white)
 
         self.drawing = False
+        self.tool = "pen"
         self.brushSize = 2
         self.brushColor = Qt.black
 
@@ -28,6 +29,7 @@ class Window(QMainWindow):
         brushMenu = mainMenu.addMenu("Brush size")
         brushColor = mainMenu.addMenu("Color")
         geometryMenu = mainMenu.addMenu("Geometry")
+        toolMenu = mainMenu.addMenu("Tools")
 
         saveAction = QAction(QIcon("icons/box_green.png"), "Сохранить", self)
         saveAction.setShortcut("Ctrl+S")
@@ -99,18 +101,33 @@ class Window(QMainWindow):
         brushColor.addAction(washAction)
         washAction.triggered.connect(self.wash)
 
+        pentoolAction = QAction(QIcon("icons/eraser.png"), "Кисть", self)
+        toolMenu.addAction(pentoolAction)
+        pentoolAction.triggered.connect(self.pen_tool)
+
+        squaretoolAction = QAction(QIcon("icons/eraser.png"), "Квадратная кисть(Прикольная вещь:D)", self)
+        toolMenu.addAction(squaretoolAction)
+        squaretoolAction.triggered.connect(self.square_tool)
+
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.drawing = True
             self.lastPoint = event.pos()
 
     def mouseMoveEvent(self, event):
-        if (event.buttons() and Qt.LeftButton) and self.drawing:
+        if (event.buttons() and Qt.LeftButton) and self.drawing and self.tool == "pen":
             painter = QPainter(self.image)
             painter.setPen(QPen(self.brushColor, self.brushSize, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             painter.drawLine(self.lastPoint, event.pos())
             self.lastPoint = event.pos()
             self.update()
+        elif (event.buttons() and Qt.LeftButton) and self.drawing and self.tool == "square":
+            painter = QPainter(self.image)
+            painter.setPen(QPen(self.brushColor, self.brushSize, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+            painter.drawRect(QRect(self.lastPoint, event.pos()))
+            self.lastPoint = event.pos()
+            self.update()
+
 
     def mouseReleaseEvent(self, event):
         if event.button == Qt.LeftButton:
@@ -167,6 +184,12 @@ class Window(QMainWindow):
 
     def wash(self):
         self.brushColor = QColor(255, 255, 255)
+
+    def pen_tool(self):
+        self.tool = "pen"
+
+    def square_tool(self):
+        self.tool = "square"
 
     def rgb(self):
         color = QColorDialog.getColor()
