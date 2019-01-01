@@ -19,9 +19,11 @@ class Window(QMainWindow):
 
         self.drawing = False
         self.tool = "pen"
+        self.geometryTool = None
         self.brushSize = 2
         self.brushColor = Qt.black
 
+        self.beginPoint = QPoint()
         self.lastPoint = QPoint()
 
         mainMenu = self.menuBar()
@@ -109,10 +111,22 @@ class Window(QMainWindow):
         toolMenu.addAction(squaretoolAction)
         squaretoolAction.triggered.connect(self.square_tool)
 
+        geometryLineAction = QAction(QIcon("icons/eraser.png"), "Прямая линия", self)
+        geometryMenu.addAction(geometryLineAction)
+        geometryLineAction.triggered.connect(self.geometry_line)
+
+        geometrySquareAction = QAction(QIcon("icons/eraser.png"), "Прямоугольник", self)
+        geometryMenu.addAction(geometrySquareAction)
+        geometrySquareAction.triggered.connect(self.geometry_square)
+
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.LeftButton and self.geometryTool is None:
             self.drawing = True
             self.lastPoint = event.pos()
+        elif event.button() == Qt.LeftButton and self.geometryTool == "square":
+            self.beginPoint = event.pos()
+            self.lastPoint = event.pos()
+            self.update()
 
     def mouseMoveEvent(self, event):
         if (event.buttons() and Qt.LeftButton) and self.drawing and self.tool == "pen":
@@ -130,12 +144,18 @@ class Window(QMainWindow):
 
 
     def mouseReleaseEvent(self, event):
-        if event.button == Qt.LeftButton:
+        if event.button == Qt.LeftButton and self.geometryTool is None:
             self.drawing = False
+        elif event.button == Qt.LeftButton and self.geometryTool == "square":
+            self.beginPoint = event.pos()
+            self.lastPoint = event.pos()
+            self.update()
 
     def paintEvent(self, event):
         canvasPainter = QPainter(self)
         canvasPainter.drawImage(self.rect(), self.image, self.image.rect())
+        if self.geometryTool == "square":
+            canvasPainter.drawRect(QRect(self.beginPoint, self.lastPoint))
 
     def save(self):
         filePath, _ = QFileDialog.getSaveFileName(self, "Сохранить изображение", "",
@@ -187,15 +207,26 @@ class Window(QMainWindow):
 
     def pen_tool(self):
         self.tool = "pen"
+        self.geometryTool = None
 
     def square_tool(self):
         self.tool = "square"
+        self.geometryTool = None
 
     def rgb(self):
         color = QColorDialog.getColor()
         if color.isValid():
             color.setNamedColor(color.name())
             self.brushColor = color
+
+    def geometry_square(self):
+        self.geometryTool = "square"
+
+    def geometry_line(self):
+        self.geometryTool = "line"
+
+    def geometry_circle(self):
+        self.geometryTool = "circle"
 
 
 if __name__ == '__main__':
